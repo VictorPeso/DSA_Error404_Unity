@@ -11,10 +11,7 @@ public abstract class Interactable : MonoBehaviour
         if (useEvents)
         {
             InteractionEvent interactionEvent = GetComponent<InteractionEvent>();
-            //if (interactionEvent != null)
-            //{
                 interactionEvent.OnInteract.Invoke();
-            //}
         }
         Interact();
     }
