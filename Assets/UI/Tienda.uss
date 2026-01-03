@@ -1,0 +1,7 @@
+:root {
+}
+
+.items {
+    align-self: auto;
+    align-items: auto;
+}

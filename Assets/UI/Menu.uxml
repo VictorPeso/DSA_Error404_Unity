@@ -1,33 +1,16 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements"
-         xmlns:uie="UnityEditor.UIElements"
-         editor-extension-mode="False">
-
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Menu.uss?fileID=7433441132597879392&amp;guid=6055dddbfe85f974ca52264fc1d9f418&amp;type=3#Menu"/>
-
     <ui:VisualElement name="Panel" style="flex-grow: 1; background-color: rgba(104, 203, 143, 0.73);">
-
-        <!-- MENU SUPERIOR -->
-        <ui:VisualElement name="Menu"
-            style="flex-grow: 1; width: 300px; align-items: center; justify-content: center; align-self: center; background-color: rgba(111, 163, 255, 0.69);">
-
-            <ui:VisualElement name="Logo"
-                style="background-image: url('project://database/Assets/UI/logo.png');
-                -unity-background-scale-mode: scale-to-fit;
-                width: 150px; height: 180px;" />
-
-            <ui:Button text="Tienda" name="Tienda"/>
-            <ui:Button text="Inventario" name="Inventario"/>
+        <ui:VisualElement name="Menu" style="width: 300px; align-self: center; flex-direction: column; align-items: center; justify-content: center; background-color: rgba(111, 163, 255, 0.69); padding: 10px; -unity-background-scale-mode: scale-to-fit; height: 500px;">
+            <ui:VisualElement name="Logo" style="background-image: url(&quot;project://database/Assets/UI/Art/logo.png?fileID=2800000&amp;guid=cfeddb649eeed324e9a69e9930250d32&amp;type=3#logo&quot;); width: 150px; height: 180px; -unity-background-scale-mode: scale-to-fit; margin-bottom: 20px;"/>
+            <ui:Button text="Tienda" name="Tienda" style="width: 200px; height: 40px; margin-bottom: 10px;"/>
+            <ui:Button text="Inventario" name="Inventario" style="width: 200px; height: 40px;"/>
         </ui:VisualElement>
-
-        <!-- PANEL TIENDA -->
-        <ui:VisualElement name="TiendaPanel" style="display: none;">
-            <ui:Label text="PANEL DE TIENDA"/>
+        <ui:VisualElement name="TiendaPanel" style="display: none; width: 600px; height: 400px; align-self: center; background-color: rgba(200, 200, 255, 0.5); flex-direction: column; padding: 20px;">
+            <ui:Label text="PANEL DE TIENDA" name="CoinsLabel" style="font-size: 18px; margin-bottom: 10px;"/>
         </ui:VisualElement>
-
-        <!-- PANEL INVENTARIO -->
-        <ui:VisualElement name="InventarioPanel" style="display: none;">
+        <ui:VisualElement name="InventarioPanel" style="display: none; width: 600px; height: 400px; align-self: center; background-color: rgba(255, 200, 200, 0.5); padding: 20px;">
             <ui:Label text="PANEL DE INVENTARIO"/>
         </ui:VisualElement>
-
     </ui:VisualElement>
 </ui:UXML>

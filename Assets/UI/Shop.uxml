@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Tienda.uss?fileID=7433441132597879392&amp;guid=00b9b63ea75619c48a790481181c3505&amp;type=3#Tienda"/>
+    <ui:VisualElement name="tiendaPanel" style="flex-grow: 1; width: 450px; height: 50px; align-self: center; aspect-ratio: 1.5; min-height: 0; max-height: none; min-width: 0; max-width: none;">
+        <ui:VisualElement name="Potion" class="items" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI/Art/Captura_de_pantalla_2026-01-03_181918-removebg-preview.png?fileID=2800000&amp;guid=cb3b6d63a2ae985459d7be8f01cd1755&amp;type=3#Captura_de_pantalla_2026-01-03_181918-removebg-preview&quot;); aspect-ratio: 1; width: 50px; min-width: 0; min-height: 0; max-height: 75px; align-self: flex-start; bottom: 0; top: 50px; left: 150px;"/>
+        <ui:Button text="Button" class="items" style="max-height: 50px; width: 50px; height: 25px; left: 300px;"/>
+        <ui:VisualElement name="Coin" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI/Art/coin-pixel-art-coin-video-games-90s-vector-removebg-preview.png?fileID=2800000&amp;guid=f48a58009bb9f6f42b29a56b7fe18449&amp;type=3#coin-pixel-art-coin-video-games-90s-vector-removebg-preview&quot;); aspect-ratio: 1; min-height: 1px; max-height: 15px; max-width: 15px; min-width: 1px; bottom: 90px; left: 500px;">
+            <ui:Label text="Coin:" name="Coin" style="top: auto; left: 20px; bottom: 10px;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
