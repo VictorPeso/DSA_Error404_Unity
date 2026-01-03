@@ -19,6 +19,8 @@ public class Enemy : MonoBehaviour
     public float fireRate;
     [SerializeField]
     private string currentState;
+
+    //Health system
     [SerializeField]
     private float health;
     [SerializeField]

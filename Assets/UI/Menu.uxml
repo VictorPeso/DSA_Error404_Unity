@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements"
+         xmlns:uie="UnityEditor.UIElements"
+         editor-extension-mode="False">
+
+    <Style src="project://database/Assets/UI/Menu.uss?fileID=7433441132597879392&amp;guid=6055dddbfe85f974ca52264fc1d9f418&amp;type=3#Menu"/>
+
+    <ui:VisualElement name="Panel" style="flex-grow: 1; background-color: rgba(104, 203, 143, 0.73);">
+
+        <!-- MENU SUPERIOR -->
+        <ui:VisualElement name="Menu"
+            style="flex-grow: 1; width: 300px; align-items: center; justify-content: center; align-self: center; background-color: rgba(111, 163, 255, 0.69);">
+
+            <ui:VisualElement name="Logo"
+                style="background-image: url('project://database/Assets/UI/logo.png');
+                -unity-background-scale-mode: scale-to-fit;
+                width: 150px; height: 180px;" />
+
+            <ui:Button text="Tienda" name="Tienda"/>
+            <ui:Button text="Inventario" name="Inventario"/>
+        </ui:VisualElement>
+
+        <!-- PANEL TIENDA -->
+        <ui:VisualElement name="TiendaPanel" style="display: none;">
+            <ui:Label text="PANEL DE TIENDA"/>
+        </ui:VisualElement>
+
+        <!-- PANEL INVENTARIO -->
+        <ui:VisualElement name="InventarioPanel" style="display: none;">
+            <ui:Label text="PANEL DE INVENTARIO"/>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
