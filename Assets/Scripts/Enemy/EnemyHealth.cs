@@ -12,8 +12,15 @@ public class EnemyHealth : MonoBehaviour
 
         if (slider == null)
         {
-            Debug.LogError("EnemyHealth: No se encontró Slider en los hijos");
+            Debug.LogError("[EnemyHealth] No Slider found in children");
         }
+    }
+    
+    public void UpdateHealthBar(float currentValue, float maxValue)
+    {
+        slider.value = currentValue / maxValue;
+    }
+}
     }
     public void UpdateHealthBar(float currentVelue, float maxValue)
     {
