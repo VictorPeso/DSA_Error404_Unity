@@ -32,6 +32,19 @@ public class PlayerMotor : MonoBehaviour
 
         controller.Move(transform.TransformDirection(moveDirection) * speed * Time.deltaTime);
 
+        // Rotar el jugador hacia donde se mueve
+        if (moveDirection.magnitude >= 0.1f)
+        {
+            // Calcular la dirección en espacio mundial
+            Vector3 targetDirection = transform.TransformDirection(moveDirection);
+            targetDirection.y = 0; // Mantener en plano horizontal
+            
+            if (targetDirection != Vector3.zero)
+            {
+                transform.forward = targetDirection.normalized;
+            }
+        }
+
         playerVelocity.y += gravity * Time.deltaTime;
 
         if (isGrounded && playerVelocity.y < 0)

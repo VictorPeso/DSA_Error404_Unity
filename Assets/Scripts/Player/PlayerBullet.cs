@@ -2,17 +2,29 @@ using UnityEngine;
 
 public class PlayerBullet : MonoBehaviour
 {
-    private void OnCollisionEnter(Collision collision)
-    {
+    public float damage = 10f;
+    public float lifeTime = 2f;
 
-        Debug.Log("Bullet collided with: " + collision.gameObject.name);
-        // Add logic for what happens when the bullet collides with something
-        if (collision.gameObject.TryGetComponent<Enemy>(out Enemy enemyComponent))
+    void Start()
+    {
+        // La bala se autodestruye a los 2 segundos para no llenar el juego de basura
+        Destroy(gameObject, lifeTime);
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        // Si choca con un Enemigo...
+        if (collision.gameObject.CompareTag("Enemy")) // Asegúrate de que el enemigo tenga el Tag "Enemy"
         {
-            Debug.Log("Bullet hit the enemy!");
-            collision.gameObject.GetComponent<Enemy>().TakeDamage(10f);
-            // You can add damage logic here
+            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                // ¡AQUÍ ESTABA EL ERROR! Ahora llamamos a la función correcta
+                enemy.TakeDamage(damage);
+            }
         }
+
+        // La bala se destruye al chocar con cualquier cosa
         Destroy(gameObject);
     }
 }

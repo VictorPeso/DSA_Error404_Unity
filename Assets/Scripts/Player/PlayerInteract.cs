@@ -2,34 +2,35 @@ using UnityEngine;
 
 public class PlayerInteract : MonoBehaviour
 {
-    private Camera cam;
-    [SerializeField]
-    private float distance = 3f;
-    [SerializeField]
-    private LayerMask mask;
-    private PlayerUI playerUI;
+    [SerializeField] private float distance = 3f;
+    [SerializeField] private LayerMask mask;
+
     private InputManager inputManager;
-    //Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
-        cam = GetComponent<PlayerLook>().cam;
-        playerUI = GetComponent<PlayerUI>();
         inputManager = GetComponent<InputManager>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        playerUI.UpdateText(string.Empty);
-        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
-        Debug.DrawRay(ray.origin, ray.direction * distance, Color.red);
+        // LÓGICA TOP-DOWN:
+        // El rayo sale de la posición del jugador (+ 1 metro de altura para que no salga de los pies)
+        // Y va hacia donde mira el jugador (transform.forward)
+        Vector3 rayOrigin = transform.position + Vector3.up * 1f;
+        Vector3 rayDirection = transform.forward;
+
+        // Dibujamos el rayo en rojo en la escena para que veas si funciona
+        Debug.DrawRay(rayOrigin, rayDirection * distance, Color.red);
+
         RaycastHit hitInfo;
-        if (Physics.Raycast(ray, out hitInfo, distance, mask))
+        // Lanzamos el rayo desde el cuerpo, no desde la cámara
+        if (Physics.Raycast(rayOrigin, rayDirection, out hitInfo, distance, mask))
         {
             if (hitInfo.collider.GetComponent<Interactable>() != null)
             {
                 Interactable interactable = hitInfo.collider.GetComponent<Interactable>();
-                playerUI.UpdateText(interactable.promptMessage);
+
                 if (inputManager.OnFoot.Interact.triggered)
                 {
                     interactable.BaseInteract();
