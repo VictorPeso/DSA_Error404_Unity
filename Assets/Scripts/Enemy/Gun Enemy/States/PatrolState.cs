@@ -26,7 +26,12 @@ public class PatrolState : BaseState
 
     public void PatrolCycle()
     {
-        if(enemy.Agent.remainingDistance < 0.2f)
+        if (enemy.path == null)
+        {
+            Debug.LogError("The enemy is missing the Path");
+            return;
+        }
+        if (enemy.Agent.remainingDistance < 0.2f)
         {
             waitTime += Time.deltaTime;
             if (waitTime >= 3)
