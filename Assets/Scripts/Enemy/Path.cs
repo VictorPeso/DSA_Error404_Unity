@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 using UnityEditor;
 
 public class Path : MonoBehaviour
@@ -37,7 +36,7 @@ public class Path : MonoBehaviour
             }
         }
     }
-    public void OndrawGizmosSelected()
+    public void OnDrawGizmosSelected()
     {
         if (alwaysDrawPath)
         {

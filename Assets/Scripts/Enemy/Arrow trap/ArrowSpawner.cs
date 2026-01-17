@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class ArrpwSpawner : MonoBehaviour
+public class ArrowSpawner : MonoBehaviour
 {
-    public GameObject arrowPrefab; // Arrastra aquí tu prefab de flecha
-    public Transform spawnPoint;   // Punto desde donde sale la flecha
-    public float fireRate = 2f;    // Tiempo entre flechas
+    public GameObject arrowPrefab;
+    public Transform spawnPoint;
+    public float fireRate = 2f;
     private float nextFireTime;
 
     void Update()
@@ -18,7 +18,7 @@ public class ArrpwSpawner : MonoBehaviour
 
     void SpawnArrow()
     {
-        // Crea la flecha en la posición y rotación del lanzador
         Instantiate(arrowPrefab, spawnPoint.position, spawnPoint.rotation);
     }
+}
 }
