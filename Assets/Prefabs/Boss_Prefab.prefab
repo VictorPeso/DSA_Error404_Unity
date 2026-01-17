@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 2579372667396820934}
   m_Layer: 0
   m_Name: Boss_Prefab
-  m_TagString: Untagged
+  m_TagString: Boss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -224,7 +224,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
@@ -238,7 +238,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 490178579365448175}
   m_Enabled: 1
-  m_AgentTypeID: 0
+  m_AgentTypeID: -1923039037
   m_Radius: 0.5
   m_Speed: 3.5
   m_Acceleration: 8
@@ -271,9 +271,12 @@ MonoBehaviour:
   gunBarrel: {fileID: 3490524820263384280}
   fireRate: 1.3
   currentState: 
-  health: 0
-  maxHealth: 50
-  healthBar: {fileID: 0}
+  health: 100
+  maxHealth: 100
+  healthBar: {fileID: 2740454507082709982}
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &6175746595288754570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,7 +301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36bda46aa87658c4bb5c1df58d48ed98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  slider: {fileID: 0}
+  slider: {fileID: 3600274101964094900}
 --- !u!1 &723900074650316808
 GameObject:
   m_ObjectHideFlags: 0

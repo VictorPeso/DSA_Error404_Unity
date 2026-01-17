@@ -6,12 +6,12 @@ public class StateMachine : MonoBehaviour
 
     public void Initialize()//BaseState startingState)
     {
-        ChangeState(new PatrolState());
+        ChangeState(new WanderState());
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame

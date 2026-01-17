@@ -194,7 +194,7 @@ GameObject:
   - component: {fileID: 8367389144116338574}
   m_Layer: 0
   m_Name: Enemy_Prefab
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -289,7 +289,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
@@ -334,11 +334,14 @@ MonoBehaviour:
   fieldOfView: 85
   eyeHeight: 0.6
   gunBarrel: {fileID: 4483990422015479723}
-  fireRate: 1.3
+  fireRate: 1
   currentState: 
-  health: 0
+  health: 50
   maxHealth: 50
-  healthBar: {fileID: 0}
+  healthBar: {fileID: 1514748313810073762}
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &3292252858282865946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,7 +366,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36bda46aa87658c4bb5c1df58d48ed98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  slider: {fileID: 0}
+  slider: {fileID: 6829620823155254584}
 --- !u!1 &1038485677266717642
 GameObject:
   m_ObjectHideFlags: 0
@@ -378,7 +381,7 @@ GameObject:
   - component: {fileID: 5967407522340632601}
   m_Layer: 0
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -487,7 +490,7 @@ GameObject:
   - component: {fileID: 4736909514173047101}
   m_Layer: 0
   m_Name: Weapon
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -523,7 +526,7 @@ GameObject:
   - component: {fileID: 4127005484355722055}
   m_Layer: 0
   m_Name: Weapon
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -635,7 +638,7 @@ GameObject:
   - component: {fileID: 1078923867227583833}
   m_Layer: 0
   m_Name: Weapon (1)
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -822,7 +825,7 @@ GameObject:
   - component: {fileID: 3259483670338516214}
   m_Layer: 0
   m_Name: Eyebrow
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -934,7 +937,7 @@ GameObject:
   - component: {fileID: 9212981361023107097}
   m_Layer: 0
   m_Name: Arm
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1046,7 +1049,7 @@ GameObject:
   - component: {fileID: 7887498331410900917}
   m_Layer: 0
   m_Name: Eye (4)
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1155,7 +1158,7 @@ GameObject:
   - component: {fileID: 4483990422015479723}
   m_Layer: 0
   m_Name: GunBarrel
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1189,7 +1192,7 @@ GameObject:
   - component: {fileID: 8310668205974255493}
   m_Layer: 0
   m_Name: Eyebrow (1)
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1301,7 +1304,7 @@ GameObject:
   - component: {fileID: 3357311140775820119}
   m_Layer: 0
   m_Name: Eye
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1516,7 +1519,7 @@ GameObject:
   - component: {fileID: 2406501951556921559}
   m_Layer: 0
   m_Name: Eye (3)
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1664,7 +1667,7 @@ GameObject:
   - component: {fileID: 968145567646559180}
   m_Layer: 0
   m_Name: Eye(2)
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
