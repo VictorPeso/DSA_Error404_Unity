@@ -20,8 +20,6 @@ public class PatrolState : BaseState
 
     public override void Exit()
     {
-        //Debug.Log("Exiting Patrol State");
-        //enemy.Agent.isStopped = true;
     }
 
     public void PatrolCycle()
