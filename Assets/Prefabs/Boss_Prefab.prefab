@@ -127,6 +127,7 @@ GameObject:
   - component: {fileID: 1031287905444016922}
   - component: {fileID: 6175746595288754570}
   - component: {fileID: 2579372667396820934}
+  - component: {fileID: 2112024756363817748}
   m_Layer: 0
   m_Name: Boss_Prefab
   m_TagString: Boss
@@ -302,6 +303,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   slider: {fileID: 3600274101964094900}
+--- !u!114 &2112024756363817748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 490178579365448175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bad1778c6331db4f90f301e5c7677a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDropSystem
+  isBoss: 1
+  minCoins: 10
+  maxCoins: 30
+  bossMinCoins: 100
+  bossMaxCoins: 200
+  dropProbability: 0.9
 --- !u!1 &723900074650316808
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,19 +11,16 @@ public class PlayerMotor : MonoBehaviour
     public float gravity = -9.8f;
     public float jumpHeight = 3f;
 
-    // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<CharacterController>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         isGrounded = controller.isGrounded;
     }
 
-    //receive the inputs for our InputManager.cs and apply them to our character controller.
     public void ProcessMove(Vector2 input)
     {
         Vector3 moveDirection = Vector3.zero;
@@ -32,13 +29,11 @@ public class PlayerMotor : MonoBehaviour
 
         controller.Move(transform.TransformDirection(moveDirection) * speed * Time.deltaTime);
 
-        // Rotar el jugador hacia donde se mueve
         if (moveDirection.magnitude >= 0.1f)
         {
-            // Calcular la dirección en espacio mundial
             Vector3 targetDirection = transform.TransformDirection(moveDirection);
-            targetDirection.y = 0; // Mantener en plano horizontal
-            
+            targetDirection.y = 0;
+
             if (targetDirection != Vector3.zero)
             {
                 transform.forward = targetDirection.normalized;

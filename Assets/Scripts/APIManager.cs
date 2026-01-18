@@ -7,7 +7,7 @@ public class APIManager : MonoBehaviour
     public static APIManager Instance;
 
     [Header("Configuración del Backend")]
-    [Tooltip("IP de tu PC donde corre el backend Java")]
+    [Tooltip("IP del backend")]
     public string serverIP = "localhost";
     public int serverPort = 8080;
 
@@ -28,6 +28,41 @@ public class APIManager : MonoBehaviour
         }
 
         baseURL = $"http://{serverIP}:{serverPort}/dsaApp";
+    }
+
+    public IEnumerator UpdateObjectQuantity(string objectId, int newQuantity, System.Action onSuccess = null)
+    {
+        if (string.IsNullOrEmpty(currentUsername))
+        {
+            Debug.LogError("[API] No hay username configurado. No se puede actualizar objeto.");
+            yield break;
+        }
+
+        string url = baseURL + "/game/unity/update-object-quantity";
+        string jsonBody = $"{{\"username\":\"{currentUsername}\",\"objectId\":\"{objectId}\",\"newQuantity\":{newQuantity}}}";
+
+        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonBody);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log($"[API] Cantidad de objeto {objectId} actualizada a {newQuantity}");
+                if (onSuccess != null)
+                {
+                    onSuccess();
+                }
+            }
+            else
+            {
+                Debug.LogError($"[API] Error al actualizar cantidad de objeto: {request.error}");
+            }
+        }
     }
 
     public void SetUsername(string username)

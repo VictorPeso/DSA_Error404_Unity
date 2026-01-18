@@ -5,7 +5,7 @@ public class GameLauncher : MonoBehaviour
 {
     [Header("Usuario de prueba (para Unity Editor)")]
     [Tooltip("Usuario usado cuando se ejecuta desde el Editor de Unity")]
-    public string testUsername = "testuser";
+    public string testUsername = "manolo102";
 
     void Start()
     {

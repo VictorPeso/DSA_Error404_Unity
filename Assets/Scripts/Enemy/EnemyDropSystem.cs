@@ -5,18 +5,16 @@ using System.Collections.Generic;
 public class EnemyDropSystem : MonoBehaviour
 {
     [Header("Tipo de Enemigo")]
-    [Tooltip("Marcar si este enemigo es un jefe (drop de objetos)")]
     public bool isBoss = false;
 
-    [Header("Recompensas - Monedas")]
+    [Header("Monedas")]
     public int minCoins = 10;
     public int maxCoins = 30;
     public int bossMinCoins = 100;
     public int bossMaxCoins = 200;
 
-    [Header("Recompensas - Boss Drops")]
+    [Header("Boss Drops")]
     [Range(0f, 1f)]
-    [Tooltip("Probabilidad de que el jefe suelte un objeto (0.9 = 90%)")]
     public float dropProbability = 0.9f;
 
     private LootTable lootTable = new LootTable();
@@ -65,10 +63,10 @@ public class EnemyDropSystem : MonoBehaviour
         if (hasProcessedDeath) return;
         hasProcessedDeath = true;
 
-        int coins = isBoss ? 
-            Random.Range(bossMinCoins, bossMaxCoins) : 
+        int coins = isBoss ?
+            Random.Range(bossMinCoins, bossMaxCoins) :
             Random.Range(minCoins, maxCoins);
-        
+
         if (APIManager.Instance != null)
         {
             StartCoroutine(APIManager.Instance.AddCoins(coins));
@@ -81,11 +79,11 @@ public class EnemyDropSystem : MonoBehaviour
         if (isBoss)
         {
             float roll = Random.value;
-            
+
             if (roll <= dropProbability)
             {
                 LootItem drop = lootTable.RollLoot();
-                
+
                 if (drop != null)
                 {
                     if (APIManager.Instance != null)
@@ -167,7 +165,7 @@ public class LootTable
 
         Rarity rolledRarity = RollRarity();
         List<LootItem> possibleItems = items.FindAll(item => item.rarity == rolledRarity);
-        
+
         if (possibleItems.Count == 0) return null;
 
         return possibleItems[Random.Range(0, possibleItems.Count)];

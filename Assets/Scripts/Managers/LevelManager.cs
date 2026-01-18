@@ -4,21 +4,21 @@ using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour
 {
     [Header("Configuración del Nivel")]
-    [Tooltip("Número del nivel actual (1-5)")]
+    [Tooltip("Número del nivel actual")]
     public int levelNumber = 1;
 
     [Tooltip("Nombre descriptivo del nivel")]
-    public string levelName = "Sector C:/";
+    public string levelName = "Sector 1";
 
     [Header("Referencias de Salas")]
-    [Tooltip("GameObject con tag 'Respawn' - Punto de spawn del jugador")]
+    [Tooltip("Punto de spawn del jugador")]
     public GameObject spawnRoom;
 
-    [Tooltip("GameObject del Boss (debe tener Enemy.cs)")]
+    [Tooltip("GameObject del Boss")]
     public GameObject boss;
 
     [Header("UI")]
-    [Tooltip("Panel de victoria (GameObject con VictoryPanel.cs) - DEBE estar oculto al inicio")]
+    [Tooltip("Panel de victoria")]
     public GameObject victoryPanel;
 
     [Header("Sistema de Puntuación")]
@@ -40,6 +40,11 @@ public class LevelManager : MonoBehaviour
         if (ProgressManager.Instance != null)
         {
             ProgressManager.Instance.ResetCurrentScore();
+        }
+
+        if (EquipmentManager.Instance != null)
+        {
+            EquipmentManager.Instance.ResetPotionsUsedCounter();
         }
 
         TeleportPlayerToSpawn();
@@ -152,12 +157,15 @@ public class LevelManager : MonoBehaviour
         VictoryPanel panel = victoryPanel.GetComponent<VictoryPanel>();
         if (panel != null)
         {
-            // TODO: Obtener coins e item del EnemyDropSystem
-            int coinsEarned = 100;
-            string itemName = "";
+            // NOTA: Las monedas y el loot YA fueron añadidos por EnemyDropSystem
+            // Aquí solo mostramos el panel con información para el jugador
+            // El VictoryPanel se encargará de guardar SOLO las pociones usadas y el progreso
+            
+            int coinsDisplayed = 100; // Solo para mostrar, ya se guardó
+            string itemDisplayed = ""; // Solo para mostrar, ya se guardó
             int nextLevel = levelNumber + 1;
 
-            panel.ShowVictory(coinsEarned, itemName, nextLevel);
+            panel.ShowVictory(coinsDisplayed, itemDisplayed, nextLevel);
         }
         else
         {
@@ -167,29 +175,29 @@ public class LevelManager : MonoBehaviour
     }
 
     public void LoadNextLevel()
-{
-    int nextLevel = levelNumber + 1;
-
-    if (nextLevel <= 5)
     {
-        SceneManager.LoadScene($"Level_{nextLevel}");
-    }
-    else
-    {
-        ReturnToMenu();
-    }
-}
+        int nextLevel = levelNumber + 1;
 
-public void ReturnToMenu()
-{
-    SceneManager.LoadScene("LevelSelector");
-}
-
-public void OnEnemyKilled()
-{
-    if (ProgressManager.Instance != null)
-    {
-        ProgressManager.Instance.AddScore(pointsPerEnemy);
+        if (nextLevel <= 5)
+        {
+            SceneManager.LoadScene($"Level_{nextLevel}");
+        }
+        else
+        {
+            ReturnToMenu();
+        }
     }
-}
+
+    public void ReturnToMenu()
+    {
+        SceneManager.LoadScene("LevelSelector");
+    }
+
+    public void OnEnemyKilled()
+    {
+        if (ProgressManager.Instance != null)
+        {
+            ProgressManager.Instance.AddScore(pointsPerEnemy);
+        }
+    }
 }

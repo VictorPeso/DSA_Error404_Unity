@@ -1,14 +1,5 @@
 using System;
 
-/// <summary>
-/// Clases para deserializar el JSON del endpoint /profile/{username}
-/// Estructura del JSON del backend:
-/// {
-///   "user": { "username": "...", "actFrag": 0, "bestScore": 0, "monedas": 100, ... },
-///   "objects": [ { "id": "obj01", "nombre": "...", "tipo": "ESPADA", "precio": 100, "cantidad": 1 }, ... ]
-/// }
-/// </summary>
-
 [Serializable]
 public class UnityProfileResponse
 {
@@ -20,21 +11,21 @@ public class UnityProfileResponse
 public class UserData
 {
     public string username;
-    public string password;      // No lo usamos pero viene del backend
-    public string email;          // No lo usamos pero viene del backend
-    public int actFrag;           // ← NIVEL MÁXIMO ALCANZADO (0-5)
-    public int bestScore;         // ← MEJOR PUNTUACIÓN
-    public int monedas;           // ← BYTES/MONEDAS ACTUALES
-    public int vidaInicial;       // No lo usamos
+    public string password;
+    public string email;
+    public int actFrag;
+    public int bestScore;
+    public int monedas;
+    public int vidaInicial;
 }
 
 [Serializable]
 public class GameObjectData
 {
-    public string id;             // ej: "obj01"
-    public string nombre;         // ej: "Antivirus Militar"
-    public string descripcion;    // ej: "Software militar..."
-    public string tipo;           // ej: "ESPADA", "ESCUDO", "ARMADURA", "CASCO", "POCION"
-    public int precio;            // Precio en la tienda
-    public int cantidad;          // Cantidad que posee el usuario
+    public string id;
+    public string nombre;
+    public string descripcion;
+    public string tipo;
+    public int precio;
+    public int cantidad;
 }

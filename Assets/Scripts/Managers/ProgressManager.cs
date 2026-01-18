@@ -9,7 +9,7 @@ public class ProgressManager : MonoBehaviour
     public string username;
 
     [Header("Progreso del Juego")]
-    [Tooltip("Nivel máximo alcanzado (ActFrag en backend). 0 = ninguno completado, 5 = todos completados")]
+    [Tooltip("Nivel máximo alcanzado")]
     public int maxLevelReached = 0;
 
     [Tooltip("Mejor puntuación de todos los tiempos")]
@@ -19,7 +19,7 @@ public class ProgressManager : MonoBehaviour
     public int currentBytes = 0;
 
     [Header("Score de Partida Actual")]
-    [Tooltip("Puntuación de la partida actual (se resetea al cambiar de nivel)")]
+    [Tooltip("Puntuación de la partida actual")]
     public int currentScore = 0;
 
     [Header("Configuración")]

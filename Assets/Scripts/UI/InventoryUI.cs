@@ -146,6 +146,8 @@ public class InventoryUI : MonoBehaviour
         ClearChildren(consumablesListParent);
         List<EquippedItem> potions = EquipmentManager.Instance.GetPotions();
 
+        Debug.Log($"[InventoryUI.RebuildConsumablesList] Pociones a mostrar: {potions.Count}");
+
         if (potions.Count == 0)
         {
             CreateEmptyMessage(consumablesListParent, "No tienes consumibles");
@@ -154,6 +156,7 @@ public class InventoryUI : MonoBehaviour
 
         foreach (EquippedItem potion in potions)
         {
+            Debug.Log($"[InventoryUI.RebuildConsumablesList] Creando botón para: {potion.nombre} (cantidad: {potion.cantidad})");
             CreatePotionButton(potion, consumablesListParent);
         }
     }

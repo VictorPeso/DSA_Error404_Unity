@@ -21,6 +21,9 @@ public class EquipmentManager : MonoBehaviour
     [Header("Inventario del Usuario")]
     public List<EquippedItem> inventory = new List<EquippedItem>();
 
+    [Header("Pociones Usadas (Para Sincronizar con Backend)")]
+    private Dictionary<string, int> potionsUsedThisLevel = new Dictionary<string, int>();
+
     [Header("Stats de la IA (se calculan automáticamente)")]
     public int totalDamage = 10;
     public int totalDefense = 5;
@@ -44,13 +47,20 @@ public class EquipmentManager : MonoBehaviour
     {
         inventory.Clear();
         
+        // ADD DEBUG LOG
+        Debug.Log($"[EquipmentManager] Recibidos {objects?.Length ?? 0} objetos del backend");
+        
         if (objects == null || objects.Length == 0)
         {
+            Debug.LogWarning("[EquipmentManager] No hay objetos para cargar en el inventario");
             return;
         }
         
         foreach (GameObjectData obj in objects)
         {
+            // ADD DEBUG LOG
+            Debug.Log($"[EquipmentManager] Objeto: id={obj.id}, nombre={obj.nombre}, tipo={obj.tipo}, cantidad={obj.cantidad}");
+            
             EquippedItem item = new EquippedItem
             {
                 objectId = obj.id,
@@ -62,6 +72,8 @@ public class EquipmentManager : MonoBehaviour
             inventory.Add(item);
         }
         
+        // ADD DEBUG LOG
+        Debug.Log($"[EquipmentManager] Total en inventario: {inventory.Count}");
         RecalculateStats();
     }
 
@@ -82,7 +94,7 @@ public class EquipmentManager : MonoBehaviour
 
         switch (item.tipo)
         {
-            case "ESPADA":
+            case "ARMA":
                 espada = item;
                 break;
             
@@ -102,7 +114,7 @@ public class EquipmentManager : MonoBehaviour
     {
         switch (slotType)
         {
-            case "ESPADA": espada = null; break;
+            case "ARMA": espada = null; break;
             case "ARMADURA": armadura = null; break;
         }
 
@@ -157,6 +169,16 @@ public class EquipmentManager : MonoBehaviour
         {
             playerHealth.RestoreHealth(25);
             potion.cantidad--;
+            
+            // Trackear la poción usada para sincronizar con el backend
+            if (!potionsUsedThisLevel.ContainsKey(potion.objectId))
+            {
+                potionsUsedThisLevel[potion.objectId] = 0;
+            }
+            potionsUsedThisLevel[potion.objectId]++;
+            
+            Debug.Log($"[EquipmentManager] Poción {potion.objectId} usada. Total usadas este nivel: {potionsUsedThisLevel[potion.objectId]}");
+            
             return true;
         }
         else
@@ -196,7 +218,7 @@ public class EquipmentManager : MonoBehaviour
         List<EquippedItem> weapons = new List<EquippedItem>();
         foreach (EquippedItem item in inventory)
         {
-            if (item.tipo == "ESPADA")
+            if (item.tipo == "ARMA")
             {
                 weapons.Add(item);
             }
@@ -220,13 +242,20 @@ public class EquipmentManager : MonoBehaviour
     public List<EquippedItem> GetPotions()
     {
         List<EquippedItem> potions = new List<EquippedItem>();
+        Debug.Log($"[EquipmentManager.GetPotions] Buscando pociones en inventario. Total items: {inventory.Count}");
+        
         foreach (EquippedItem item in inventory)
         {
+            Debug.Log($"[EquipmentManager.GetPotions] Revisando item: id={item.objectId}, tipo={item.tipo}, cantidad={item.cantidad}");
+            
             if (item.tipo == "POCION")
             {
+                Debug.Log($"[EquipmentManager.GetPotions] ✓ Poción encontrada: {item.nombre}");
                 potions.Add(item);
             }
         }
+        
+        Debug.Log($"[EquipmentManager.GetPotions] Total pociones encontradas: {potions.Count}");
         return potions;
     }
 
@@ -234,7 +263,7 @@ public class EquipmentManager : MonoBehaviour
     {
         if (item == null) return false;
         
-        if (item.tipo == "ESPADA" && espada != null && espada.objectId == item.objectId)
+        if (item.tipo == "ARMA" && espada != null && espada.objectId == item.objectId)
         {
             return true;
         }
@@ -246,4 +275,26 @@ public class EquipmentManager : MonoBehaviour
         
         return false;
     }
+
+    /// <summary>
+    /// Obtiene las pociones usadas durante este nivel y reinicia el contador.
+    /// Retorna un diccionario con objectId -> cantidad usada
+    /// </summary>
+    public Dictionary<string, int> GetAndResetPotionsUsed()
+    {
+        var used = new Dictionary<string, int>(potionsUsedThisLevel);
+        potionsUsedThisLevel.Clear();
+        Debug.Log($"[EquipmentManager] Reseteando contador de pociones. Total tipos usados: {used.Count}");
+        return used;
+    }
+
+    /// <summary>
+    /// Reinicia el contador de pociones usadas (llamar al inicio de cada nivel)
+    /// </summary>
+    public void ResetPotionsUsedCounter()
+    {
+        potionsUsedThisLevel.Clear();
+        Debug.Log("[EquipmentManager] Contador de pociones reseteado");
+    }
 }
+

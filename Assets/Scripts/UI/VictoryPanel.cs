@@ -2,10 +2,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Panel de victoria que se muestra al derrotar al boss
 /// Muestra recompensas (monedas, items) y botones para continuar
+/// Guarda progreso en el backend antes de cambiar de escena
 /// </summary>
 public class VictoryPanel : MonoBehaviour
 {
@@ -20,6 +23,10 @@ public class VictoryPanel : MonoBehaviour
     [SerializeField] private string levelSelectorSceneName = "LevelSelector";
 
     private int nextLevelNumber;
+    private int coinsEarned;
+    private string lootObjectId;
+    private int levelCompleted;
+    private bool isSaving = false;
 
     void Start()
     {
@@ -43,6 +50,9 @@ public class VictoryPanel : MonoBehaviour
     /// </summary>
     public void ShowVictory(int coinsEarned, string itemName, int nextLevel)
     {
+        this.coinsEarned = coinsEarned;
+        this.lootObjectId = itemName; // En realidad es el objectId (ej: "obj01")
+        this.levelCompleted = nextLevel - 1; // Si nextLevel=2, completó el nivel 1
         nextLevelNumber = nextLevel;
 
         // Actualizar textos
@@ -87,10 +97,39 @@ public class VictoryPanel : MonoBehaviour
         }
 
         gameObject.SetActive(true);
+        Time.timeScale = 0f; // Pausar el juego
+        
+        Debug.Log($"[VictoryPanel] Nivel {levelCompleted} completado. Coins: {coinsEarned}, Loot: {lootObjectId}");
     }
 
     void OnNextLevelClicked()
     {
+        if (isSaving)
+        {
+            Debug.LogWarning("[VictoryPanel] Ya se está guardando, ignorando click");
+            return;
+        }
+        
+        StartCoroutine(SaveProgressAndLoadNextLevel());
+    }
+
+    void OnMenuClicked()
+    {
+        if (isSaving)
+        {
+            Debug.LogWarning("[VictoryPanel] Ya se está guardando, ignorando click");
+            return;
+        }
+        
+        StartCoroutine(SaveProgressAndReturnToMenu());
+    }
+
+    IEnumerator SaveProgressAndLoadNextLevel()
+    {
+        isSaving = true;
+        yield return StartCoroutine(SaveAllProgress());
+        
+        Time.timeScale = 1f;
         string nextSceneName = $"Level_{nextLevelNumber}";
         
         if (Application.CanStreamedLevelBeLoaded(nextSceneName))
@@ -104,8 +143,75 @@ public class VictoryPanel : MonoBehaviour
         }
     }
 
-    void OnMenuClicked()
+    IEnumerator SaveProgressAndReturnToMenu()
     {
+        isSaving = true;
+        yield return StartCoroutine(SaveAllProgress());
+        
+        Time.timeScale = 1f;
         SceneManager.LoadScene(levelSelectorSceneName);
     }
+
+    IEnumerator SaveAllProgress()
+    {
+        Debug.Log("[VictoryPanel] ========== INICIANDO GUARDADO DE PROGRESO ==========");
+        
+        // NOTA: Las monedas y el loot YA fueron guardados por EnemyDropSystem al morir el boss
+        // Solo necesitamos guardar las pociones usadas y el progreso del nivel
+        
+        // 1. Guardar pociones usadas
+        if (EquipmentManager.Instance != null && APIManager.Instance != null)
+        {
+            var potionsUsed = EquipmentManager.Instance.GetAndResetPotionsUsed();
+            
+            if (potionsUsed.Count > 0)
+            {
+                Debug.Log($"[VictoryPanel] Guardando {potionsUsed.Count} tipos de pociones usadas...");
+                
+                foreach (var kvp in potionsUsed)
+                {
+                    string objectId = kvp.Key;
+                    int usedCount = kvp.Value;
+                    
+                    // Encontrar el item actual en el inventario para saber la cantidad restante
+                    EquippedItem item = EquipmentManager.Instance.inventory
+                        .Find(i => i.objectId == objectId);
+                    
+                    if (item != null)
+                    {
+                        int newQuantity = item.cantidad; // Ya está actualizado localmente
+                        Debug.Log($"[VictoryPanel] Actualizando {objectId}: cantidad={newQuantity} (usadas: {usedCount})");
+                        
+                        yield return StartCoroutine(
+                            APIManager.Instance.UpdateObjectQuantity(objectId, newQuantity)
+                        );
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[VictoryPanel] Item {objectId} no encontrado en inventario");
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log("[VictoryPanel] No se usaron pociones en este nivel");
+            }
+        }
+        
+        // 2. Actualizar actFrag y bestScore
+        if (ProgressManager.Instance != null)
+        {
+            int currentScore = ProgressManager.Instance.currentScore;
+            Debug.Log($"[VictoryPanel] Guardando progreso: actFrag={levelCompleted}, bestScore={currentScore}");
+            
+            // Esto ya llama internamente a APIManager.UpdateProgress()
+            ProgressManager.Instance.UpdateProgress(levelCompleted, currentScore);
+            
+            // Esperar un frame para que se complete la llamada
+            yield return null;
+        }
+        
+        Debug.Log("[VictoryPanel] ========== PROGRESO GUARDADO EXITOSAMENTE ==========");
+    }
 }
+
