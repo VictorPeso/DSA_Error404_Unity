@@ -122,13 +122,7 @@ public class Enemy : MonoBehaviour
 
     public void Die()
     {
-        Debug.Log($"[Enemy] {gameObject.name} ha muerto");
-        
-        // Invocar evento ANTES de destruir
-        // Esto permite que LevelManager detecte la muerte del boss
         OnDeath?.Invoke();
-        
-        // Esperar un frame antes de destruir (para que listeners ejecuten)
         Destroy(gameObject, 0.1f);
     }
 }

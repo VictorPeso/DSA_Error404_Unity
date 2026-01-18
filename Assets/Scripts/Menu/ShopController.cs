@@ -38,11 +38,6 @@ public class ShopController : MonoBehaviour
         {
             playerCoins -= potionCost;
             UpdateCoinLabel();
-            Debug.Log("Poción comprada");
-        }
-        else
-        {
-            Debug.Log("No tienes suficientes monedas.");
         }
     }
 

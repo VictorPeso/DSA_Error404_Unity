@@ -50,7 +50,6 @@ public class AttackState : BaseState
 
     void Shoot()
     {
-        // 1. Calcular desde dónde sale la bala
         Vector3 shootOrigin = enemy.transform.position;
         if (enemy.gunBarrel != null)
         {
@@ -58,28 +57,18 @@ public class AttackState : BaseState
         }
         else
         {
-            // Si no tiene cañón asignado, sacamos la bala desde el pecho (hacia adelante)
             shootOrigin += Vector3.up * 1.5f + enemy.transform.forward * 0.6f;
         }
 
-        // 2. Calcular dirección hacia el jugador
-        // Apuntamos al pecho del jugador (up * 1.0f) para no disparar al suelo
         Vector3 targetPos = enemy.Player.transform.position + Vector3.up * 1.0f;
         Vector3 direction = (targetPos - shootOrigin).normalized;
 
-        // --- DEPURACIÓN VISUAL ---
-        // Dibuja una línea AZUL durante 1 segundo para ver la trayectoria de la bala
         Debug.DrawRay(shootOrigin, direction * enemy.sightDistance, Color.blue, 1f);
-        // -------------------------
 
         if (Physics.Raycast(shootOrigin, direction, out RaycastHit hit, enemy.sightDistance))
         {
-            // MIRA LA CONSOLA: Te dirá qué está tocando la bala
-            Debug.Log("La bala ha tocado: " + hit.collider.name);
-
             if (hit.collider.CompareTag("Player"))
             {
-                Debug.Log("¡PUM! DISPARO ACERTADO");
                 hit.collider.GetComponent<PlayerHealth>()?.TakeDamage(10);
             }
         }

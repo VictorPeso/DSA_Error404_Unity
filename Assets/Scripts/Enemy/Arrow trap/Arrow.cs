@@ -25,7 +25,6 @@ public class Arrow : MonoBehaviour
             {
                 float randomDamage = Random.Range(damage - 5, damage + 5);
                 playerHealth.TakeDamage(randomDamage);
-                Debug.Log("¡Flecha impactó al jugador!");
             }
             Destroy(gameObject); 
         }
