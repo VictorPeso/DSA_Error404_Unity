@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbfc9d16f388e7545bc715e80fae6f5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::APIManager
-  serverIP: localhost
+  serverIP: 192.168.1.128
   serverPort: 8080
 --- !u!1 &383593300
 GameObject:

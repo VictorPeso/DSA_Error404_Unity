@@ -69,7 +69,16 @@ public class EnemyDropSystem : MonoBehaviour
 
         if (APIManager.Instance != null)
         {
-            StartCoroutine(APIManager.Instance.AddCoins(coins));
+            APIManager.Instance.StartCoroutine(APIManager.Instance.AddCoins(coins));
+
+            if (isBoss)
+            {
+                Debug.Log($"[EnemyDrops] 🔥 JEFE eliminado. Monedas: {coins}");
+            }
+            else
+            {
+                Debug.Log($"[EnemyDrops] Enemigo eliminado. Monedas: {coins}");
+            }
         }
         else
         {
@@ -86,13 +95,20 @@ public class EnemyDropSystem : MonoBehaviour
 
                 if (drop != null)
                 {
+                    string colorTag = GetRarityColorTag(drop.rarity);
+                    Debug.Log($"[EnemyDrops] 🎁 ¡DROP! {colorTag}{drop.itemId} ({drop.rarity})</color>");
+
                     if (APIManager.Instance != null)
                     {
-                        StartCoroutine(APIManager.Instance.AddBossLoot(drop.itemId));
+                        APIManager.Instance.StartCoroutine(APIManager.Instance.AddBossLoot(drop.itemId));
                     }
 
                     ShowDropEffect(drop);
                 }
+            }
+            else
+            {
+                Debug.Log("[EnemyDrops] Boss no droppeó item esta vez");
             }
         }
     }

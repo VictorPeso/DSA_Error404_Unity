@@ -70,6 +70,23 @@ public class LevelManager : MonoBehaviour
                 Debug.LogWarning("[LevelManager] No se encontró GameObject con tag 'Boss'");
             }
         }
+
+        if (victoryPanel == null)
+        {
+            Debug.Log("[LevelManager] VictoryPanel no asignado, buscando en la escena...");
+
+            VictoryPanel panelScript = FindObjectOfType<VictoryPanel>();
+            if (panelScript != null)
+            {
+                victoryPanel = panelScript.gameObject;
+                Debug.Log($"[LevelManager] ✅ VictoryPanel encontrado automáticamente: {victoryPanel.name}");
+            }
+            else
+            {
+                Debug.LogError("[LevelManager] ❌ No se encontró ningún GameObject con componente VictoryPanel en la escena!");
+                Debug.LogError("[LevelManager] SOLUCIÓN: Asegúrate de que hay un panel UI con el script VictoryPanel.cs en la escena");
+            }
+        }
     }
 
     void TeleportPlayerToSpawn()
@@ -98,24 +115,34 @@ public class LevelManager : MonoBehaviour
 
     void SubscribeToBossDeathEvent()
     {
+        Debug.Log("[LevelManager] Intentando suscribirse al evento de muerte del boss...");
+
         if (boss == null)
         {
-            Debug.LogWarning("[LevelManager] No se puede suscribir: boss es null");
+            Debug.LogWarning("[LevelManager] ❌ Boss es NULL, no se puede suscribir");
+            Debug.LogWarning("[LevelManager] SOLUCIÓN: Arrastra el GameObject del boss al campo 'Boss' en Inspector");
             return;
         }
+
+        Debug.Log($"[LevelManager] Boss encontrado: {boss.name}");
 
         Enemy bossEnemy = boss.GetComponent<Enemy>();
         if (bossEnemy == null)
         {
-            Debug.LogError($"[LevelManager] Boss '{boss.name}' no tiene componente Enemy.cs");
+            Debug.LogError($"[LevelManager] ❌ Boss '{boss.name}' NO tiene componente Enemy.cs");
+            Debug.LogError("[LevelManager] SOLUCIÓN: Añade el script Enemy.cs al GameObject del boss");
             return;
         }
 
+        Debug.Log("[LevelManager] Componente Enemy encontrado, añadiendo listener...");
         bossEnemy.OnDeath.AddListener(OnBossDefeated);
+        Debug.Log("[LevelManager] ✅ Suscripción exitosa al evento OnDeath del boss");
     }
 
     void OnBossDefeated()
     {
+        Debug.Log("========== [LevelManager] BOSS DERROTADO ==========");
+
         if (bossDefeated)
         {
             Debug.LogWarning("[LevelManager] OnBossDefeated ya fue llamado, ignorando...");
@@ -124,12 +151,25 @@ public class LevelManager : MonoBehaviour
 
         bossDefeated = true;
 
+        if (boss != null)
+        {
+            Enemy bossEnemy = boss.GetComponent<Enemy>();
+            if (bossEnemy != null)
+            {
+                bossEnemy.OnDeath.RemoveListener(OnBossDefeated);
+                Debug.Log("[LevelManager] Desuscrito del evento OnDeath del boss");
+            }
+        }
+
+        Debug.Log($"[LevelManager] Añadiendo puntos: {pointsPerBoss + levelCompletionBonus}");
+
         if (ProgressManager.Instance != null)
         {
             ProgressManager.Instance.AddScore(pointsPerBoss + levelCompletionBonus);
         }
 
         UpdateProgress();
+        Debug.Log("[LevelManager] Mostrando panel de victoria...");
         ShowVictoryPanel();
     }
 
@@ -147,31 +187,42 @@ public class LevelManager : MonoBehaviour
 
     void ShowVictoryPanel()
     {
+        Debug.Log("[LevelManager] ========== ShowVictoryPanel() llamado ==========");
+
         if (victoryPanel == null)
         {
-            Debug.LogWarning("[LevelManager] VictoryPanel no asignado en Inspector");
+            Debug.LogError("[LevelManager] ❌ VictoryPanel NO está asignado en Inspector!");
+            Debug.LogError("[LevelManager] SOLUCIÓN: Arrastra el GameObject del panel al campo 'Victory Panel'");
             Invoke("ReturnToMenu", 2f);
             return;
         }
 
+        Debug.Log($"[LevelManager] VictoryPanel encontrado: {victoryPanel.name}");
+        Debug.Log($"[LevelManager] VictoryPanel activo antes: {victoryPanel.activeSelf}");
+        Debug.Log($"[LevelManager] VictoryPanel transform parent: {(victoryPanel.transform.parent != null ? victoryPanel.transform.parent.name : "null")}");
+
         VictoryPanel panel = victoryPanel.GetComponent<VictoryPanel>();
         if (panel != null)
         {
-            // NOTA: Las monedas y el loot YA fueron añadidos por EnemyDropSystem
-            // Aquí solo mostramos el panel con información para el jugador
-            // El VictoryPanel se encargará de guardar SOLO las pociones usadas y el progreso
-            
-            int coinsDisplayed = 100; // Solo para mostrar, ya se guardó
-            string itemDisplayed = ""; // Solo para mostrar, ya se guardó
+
+            int coinsDisplayed = 100;
+            string itemDisplayed = "";
             int nextLevel = levelNumber + 1;
 
+            Debug.Log($"[LevelManager] Llamando panel.ShowVictory() con nextLevel={nextLevel}");
             panel.ShowVictory(coinsDisplayed, itemDisplayed, nextLevel);
+            Debug.Log($"[LevelManager] VictoryPanel activo después de ShowVictory: {victoryPanel.activeSelf}");
         }
         else
         {
-            Debug.LogError("[LevelManager] VictoryPanel no tiene componente VictoryPanel.cs");
+            Debug.LogError($"[LevelManager] ❌ VictoryPanel '{victoryPanel.name}' NO tiene componente VictoryPanel.cs!");
+            Debug.LogError("[LevelManager] SOLUCIÓN: Añade el script VictoryPanel.cs al GameObject");
+            Debug.Log("[LevelManager] Intentando activar panel manualmente sin script...");
             victoryPanel.SetActive(true);
+            Debug.Log($"[LevelManager] VictoryPanel activo después de SetActive manual: {victoryPanel.activeSelf}");
         }
+
+        Debug.Log("[LevelManager] ========== ShowVictoryPanel() completado ==========");
     }
 
     public void LoadNextLevel()

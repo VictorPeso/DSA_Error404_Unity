@@ -35,6 +35,8 @@ public class Enemy : MonoBehaviour
     [Tooltip("Evento que se dispara cuando el enemigo muere")]
     public UnityEvent OnDeath = new UnityEvent();
 
+    private bool isDead = false;
+
     void Start()
     {
         stateMachine = GetComponent<StateMachine>();
@@ -50,7 +52,6 @@ public class Enemy : MonoBehaviour
             healthBar.UpdateHealthBar(health, maxHealth);
         }
 
-        // Solo inicializar StateMachine si existe (opcional para bosses)
         if (stateMachine != null)
         {
             stateMachine.Initialize();
@@ -101,6 +102,8 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        if (isDead) return;
+
         health -= damage;
 
         if (healthBar != null)
@@ -116,6 +119,15 @@ public class Enemy : MonoBehaviour
 
     public void Die()
     {
+        if (isDead)
+        {
+            Debug.LogWarning($"[Enemy] {gameObject.name} ya está muerto, ignorando Die()");
+            return;
+        }
+
+        isDead = true;
+        Debug.Log($"[Enemy] {gameObject.name} ha muerto, invocando OnDeath");
+
         OnDeath?.Invoke();
         Destroy(gameObject, 0.1f);
     }
