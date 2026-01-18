@@ -92,16 +92,11 @@ public class PlayerHealth : MonoBehaviour
 
     void Respawn()
     {
-        Debug.Log("¡JUGADOR MUERTO! Volviendo al inicio...");
-
-        // 1. Truco para mover CharacterController (si existe)
         if (charController != null) charController.enabled = false;
 
-        // 2. Teletransportar al punto guardado en Start
         transform.position = spawnPosition;
         transform.rotation = spawnRotation;
 
-        // 3. Reactivar CharacterController
         if (charController != null) charController.enabled = true;
 
         // 4. Resetear Vida y Barras visuales AL INSTANTE

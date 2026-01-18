@@ -86,20 +86,11 @@ public class VictoryPanel : MonoBehaviour
             }
         }
 
-        // Mostrar panel
         gameObject.SetActive(true);
-
-        Debug.Log($"[VictoryPanel] Panel mostrado - Coins: {coinsEarned}, Item: {itemName}, Next Level: {nextLevel}");
     }
 
-    /// <summary>
-    /// Botón "Siguiente Nivel" presionado
-    /// </summary>
     void OnNextLevelClicked()
     {
-        Debug.Log($"[VictoryPanel] Cargando nivel {nextLevelNumber}...");
-
-        // Cargar siguiente nivel
         string nextSceneName = $"Level_{nextLevelNumber}";
         
         if (Application.CanStreamedLevelBeLoaded(nextSceneName))
@@ -113,12 +104,8 @@ public class VictoryPanel : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Botón "Menú Principal" presionado
-    /// </summary>
     void OnMenuClicked()
     {
-        Debug.Log("[VictoryPanel] Volviendo al selector de niveles");
         SceneManager.LoadScene(levelSelectorSceneName);
     }
 }

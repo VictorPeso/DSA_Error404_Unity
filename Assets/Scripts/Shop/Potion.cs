@@ -11,7 +11,6 @@ public class Potion : Interactable
         if (playerHealth != null)
         {
             playerHealth.RestoreHealth(healAmount);
-            Debug.Log("Vida regenerada +" + healAmount);
         }
     }
 }
