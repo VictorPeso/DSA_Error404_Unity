@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbfc9d16f388e7545bc715e80fae6f5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::APIManager
-  serverIP: 192.168.1.128
+  serverIP: 192.168.10.49
   serverPort: 8080
 --- !u!1 &383593300
 GameObject:
@@ -582,7 +582,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64a6a8f72d9c5f8418b73b6f78870ec3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameLauncher
-  testUsername: manolo102
+  testUsername: hola10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -107,7 +107,7 @@ public class LevelManager : MonoBehaviour
         CharacterController cc = player.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
 
-        player.transform.position = spawnRoom.transform.position;
+        player.transform.position = spawnRoom.transform.position + Vector3.up * 1f;
         player.transform.rotation = spawnRoom.transform.rotation;
 
         if (cc != null) cc.enabled = true;
@@ -204,25 +204,16 @@ public class LevelManager : MonoBehaviour
         VictoryPanel panel = victoryPanel.GetComponent<VictoryPanel>();
         if (panel != null)
         {
+            int puntosReales = 0;
+            if (ProgressManager.Instance != null)
+            {
+                puntosReales = ProgressManager.Instance.currentScore;
+            }
 
-            int coinsDisplayed = 100;
-            string itemDisplayed = "";
-            int nextLevel = levelNumber + 1;
+            panel.ShowVictory(puntosReales, "", levelNumber + 1);
 
-            Debug.Log($"[LevelManager] Llamando panel.ShowVictory() con nextLevel={nextLevel}");
-            panel.ShowVictory(coinsDisplayed, itemDisplayed, nextLevel);
-            Debug.Log($"[LevelManager] VictoryPanel activo después de ShowVictory: {victoryPanel.activeSelf}");
+            Debug.Log($"[LevelManager]  Bytes Reales: {puntosReales}");
         }
-        else
-        {
-            Debug.LogError($"[LevelManager] ❌ VictoryPanel '{victoryPanel.name}' NO tiene componente VictoryPanel.cs!");
-            Debug.LogError("[LevelManager] SOLUCIÓN: Añade el script VictoryPanel.cs al GameObject");
-            Debug.Log("[LevelManager] Intentando activar panel manualmente sin script...");
-            victoryPanel.SetActive(true);
-            Debug.Log($"[LevelManager] VictoryPanel activo después de SetActive manual: {victoryPanel.activeSelf}");
-        }
-
-        Debug.Log("[LevelManager] ========== ShowVictoryPanel() completado ==========");
     }
 
     public void LoadNextLevel()

@@ -8,6 +8,7 @@ public class PlayerAttack : MonoBehaviour
 
     [Header("Referencias")]
     public Transform firePoint;
+    public GameObject visualProjectilePrefab;
 
     private InputManager inputManager;
 
@@ -37,33 +38,44 @@ public class PlayerAttack : MonoBehaviour
     {
         // Punto de origen del disparo (a media altura, centro del cuerpo)
         Vector3 origin = transform.position + Vector3.up * 0.5f + transform.forward * 0.5f;
-        if (firePoint != null) 
+        if (firePoint != null)
         {
             origin = firePoint.position;
         }
 
         Vector3 direction = transform.forward;
 
+        // Instanciar proyectil visual
+        if (visualProjectilePrefab != null)
+        {
+            GameObject projectile = Instantiate(visualProjectilePrefab, origin, Quaternion.LookRotation(direction));
+            Debug.Log($"[PlayerAttack] Proyectil instanciado en {origin}");
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerAttack] visualProjectilePrefab es null, asígnalo en el inspector");
+        }
+
         Debug.DrawRay(origin, direction * range, Color.red, 2f);
 
         if (Physics.Raycast(origin, direction, out RaycastHit hit, range))
         {
             Enemy enemy = hit.collider.GetComponent<Enemy>();
-            
+
             if (enemy == null)
             {
                 enemy = hit.collider.GetComponentInParent<Enemy>();
             }
-            
+
             if (enemy != null)
             {
                 float calculatedDamage = damage;
-                
+
                 if (EquipmentManager.Instance != null)
                 {
                     calculatedDamage = EquipmentManager.Instance.totalDamage;
                 }
-                
+
                 enemy.TakeDamage(calculatedDamage);
             }
             else
