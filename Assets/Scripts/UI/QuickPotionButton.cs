@@ -2,11 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Botón de HUD para usar pociones rápidamente
-/// Se actualiza automáticamente mostrando la cantidad disponible
-/// Compatible con controles táctiles para Android
-/// </summary>
 public class QuickPotionButton : MonoBehaviour
 {
     [Header("Referencias UI")]
@@ -15,7 +10,6 @@ public class QuickPotionButton : MonoBehaviour
 
     void Start()
     {
-        // Verificar que las referencias estén asignadas
         if (potionButton == null)
         {
             potionButton = GetComponentInChildren<Button>();
@@ -33,29 +27,21 @@ public class QuickPotionButton : MonoBehaviour
 
     void Update()
     {
-        // Verificar si EquipmentManager está disponible
         if (EquipmentManager.Instance == null) return;
 
-        // Obtener cantidad de pociones disponibles
         int count = EquipmentManager.Instance.GetPotionCount();
 
-        // Actualizar texto de cantidad
         if (countText != null)
         {
             countText.text = $"x{count}";
         }
 
-        // Habilitar/deshabilitar botón según disponibilidad
         if (potionButton != null)
         {
             potionButton.interactable = (count > 0);
         }
     }
 
-    /// <summary>
-    /// Callback del botón - Usa una poción
-    /// Este método se llama desde el evento OnClick del botón en el Inspector
-    /// </summary>
     public void OnPotionButtonClick()
     {
         if (EquipmentManager.Instance == null)
@@ -64,15 +50,6 @@ public class QuickPotionButton : MonoBehaviour
             return;
         }
 
-        bool success = EquipmentManager.Instance.UsePotion();
-        
-        if (success)
-        {
-            Debug.Log("[QuickPotionButton] ✅ Poción usada (+25 HP)");
-        }
-        else
-        {
-            Debug.Log("[QuickPotionButton] ❌ No tienes pociones disponibles");
-        }
+        EquipmentManager.Instance.UsePotion();
     }
 }

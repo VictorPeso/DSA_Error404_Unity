@@ -2,19 +2,12 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
 
-/// <summary>
-/// Gestor de comunicación con el backend REST API
-/// Singleton que persiste entre escenas
-/// </summary>
 public class APIManager : MonoBehaviour
 {
     public static APIManager Instance;
 
-    // ⚠️ IMPORTANTE: Cambia esta IP por la de tu PC
-    // Para obtenerla: Abre CMD y escribe "ipconfig" (busca IPv4 Address)
-    // Ejemplo: 192.168.1.100, 192.168.0.15, etc.
     [Header("Configuración del Backend")]
-    [Tooltip("IP de tu PC donde corre el backend Java")]
+    [Tooltip("IP del backend")]
     public string serverIP = "localhost";
     public int serverPort = 8080;
 
@@ -23,7 +16,6 @@ public class APIManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton: Este objeto sobrevive entre escenas
         if (Instance == null)
         {
             Instance = this;
@@ -35,18 +27,47 @@ public class APIManager : MonoBehaviour
             return;
         }
 
-        // Construir URL base
         baseURL = $"http://{serverIP}:{serverPort}/dsaApp";
-        Debug.Log($"[API] URL del backend configurada: {baseURL}");
     }
 
-    /// <summary>
-    /// Configurar el username del jugador actual
-    /// </summary>
+    public IEnumerator UpdateObjectQuantity(string objectId, int newQuantity, System.Action onSuccess = null)
+    {
+        if (string.IsNullOrEmpty(currentUsername))
+        {
+            Debug.LogError("[API] No hay username configurado. No se puede actualizar objeto.");
+            yield break;
+        }
+
+        string url = baseURL + "/game/unity/update-object-quantity";
+        string jsonBody = $"{{\"username\":\"{currentUsername}\",\"objectId\":\"{objectId}\",\"newQuantity\":{newQuantity}}}";
+
+        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonBody);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log($"[API] Cantidad de objeto {objectId} actualizada a {newQuantity}");
+                if (onSuccess != null)
+                {
+                    onSuccess();
+                }
+            }
+            else
+            {
+                Debug.LogError($"[API] Error al actualizar cantidad de objeto: {request.error}");
+            }
+        }
+    }
+
     public void SetUsername(string username)
     {
         currentUsername = username;
-        Debug.Log($"[API] Username configurado: {username}");
     }
 
     public string GetUsername()
@@ -54,11 +75,6 @@ public class APIManager : MonoBehaviour
         return currentUsername;
     }
 
-    // ==================== ENDPOINTS ====================
-
-    /// <summary>
-    /// 1. AÑADIR MONEDAS - Se llama cuando el jugador mata enemigos
-    /// </summary>
     public IEnumerator AddCoins(int amount)
     {
         if (string.IsNullOrEmpty(currentUsername))
@@ -77,25 +93,15 @@ public class APIManager : MonoBehaviour
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
 
-            Debug.Log($"[API] Enviando {amount} monedas al servidor...");
-
             yield return request.SendWebRequest();
 
-            if (request.result == UnityWebRequest.Result.Success)
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log($"[API] ✅ Monedas añadidas correctamente. Respuesta: {request.downloadHandler.text}");
-            }
-            else
-            {
-                Debug.LogError($"[API] ❌ Error al añadir monedas: {request.error}");
-                Debug.LogError($"[API] Código de respuesta: {request.responseCode}");
+                Debug.LogError($"[API] Error al añadir monedas: {request.error}");
             }
         }
     }
 
-    /// <summary>
-    /// 2. OBTENER PERFIL - Descarga datos del usuario (monedas, objetos, progreso)
-    /// </summary>
     public IEnumerator GetProfile(System.Action<string> onSuccess = null)
     {
         if (string.IsNullOrEmpty(currentUsername))
@@ -108,15 +114,11 @@ public class APIManager : MonoBehaviour
 
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
-            Debug.Log($"[API] Descargando perfil del servidor para: {currentUsername}");
-
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
-                Debug.Log($"[API] ✅ Perfil descargado correctamente");
-                Debug.Log($"[API] JSON: {jsonResponse}");
 
                 if (onSuccess != null)
                 {
@@ -125,15 +127,11 @@ public class APIManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"[API] ❌ Error al obtener perfil: {request.error}");
-                Debug.LogError($"[API] Código de respuesta: {request.responseCode}");
+                Debug.LogError($"[API] Error al obtener perfil: {request.error}");
             }
         }
     }
 
-    /// <summary>
-    /// 3. ACTUALIZAR PROGRESO - Guarda ActFrag y BestScore en el backend
-    /// </summary>
     public IEnumerator UpdateProgress(int actFrag, int bestScore)
     {
         if (string.IsNullOrEmpty(currentUsername))
@@ -152,24 +150,15 @@ public class APIManager : MonoBehaviour
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
 
-            Debug.Log($"[API] Actualizando progreso: ActFrag={actFrag}, BestScore={bestScore}");
-
             yield return request.SendWebRequest();
 
-            if (request.result == UnityWebRequest.Result.Success)
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log("[API] ✅ Progreso actualizado correctamente");
-            }
-            else
-            {
-                Debug.LogError($"[API] ❌ Error al actualizar progreso: {request.error}");
+                Debug.LogError($"[API] Error al actualizar progreso: {request.error}");
             }
         }
     }
 
-    /// <summary>
-    /// 4. BOSS LOOT - Añade un objeto gratis al inventario (drop de jefe)
-    /// </summary>
     public IEnumerator AddBossLoot(string objectId)
     {
         if (string.IsNullOrEmpty(currentUsername))
@@ -188,18 +177,11 @@ public class APIManager : MonoBehaviour
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
 
-            Debug.Log($"[API] Añadiendo loot del jefe: {objectId}");
-
             yield return request.SendWebRequest();
 
-            if (request.result == UnityWebRequest.Result.Success)
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log($"[API] ✅ Loot añadido correctamente: {objectId}");
-            }
-            else
-            {
-                Debug.LogError($"[API] ❌ Error al añadir loot: {request.error}");
-                Debug.LogError($"[API] Código de respuesta: {request.responseCode}");
+                Debug.LogError($"[API] Error al añadir loot: {request.error}");
             }
         }
     }

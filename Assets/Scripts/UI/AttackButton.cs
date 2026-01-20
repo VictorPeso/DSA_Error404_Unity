@@ -1,41 +1,88 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-/// <summary>
-/// Script para botón UI de ataque
-/// Llama al método Atacar() del Player cuando se presiona el botón
-/// </summary>
+[RequireComponent(typeof(Button))]
 public class AttackButton : MonoBehaviour
 {
     private PlayerAttack playerAttack;
-
+    private Button button;
+    
+    void Awake()
+    {
+        button = GetComponent<Button>();
+    }
+    
     void Start()
     {
-        // Buscar el PlayerAttack en la escena
+        FindPlayerAttack();
+        
+        if (button != null)
+        {
+            button.onClick.AddListener(OnAttackClicked);
+        }
+    }
+    
+    void FindPlayerAttack()
+    {
         playerAttack = FindObjectOfType<PlayerAttack>();
         
         if (playerAttack == null)
         {
-            Debug.LogError("[AttackButton] No se encontró PlayerAttack en la escena!");
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                playerAttack = player.GetComponent<PlayerAttack>();
+            }
         }
-        else
+        
+        if (playerAttack == null)
         {
-            Debug.Log("[AttackButton] PlayerAttack encontrado correctamente");
+            Debug.LogError("[AttackButton] PlayerAttack NO encontrado!");
+            Debug.Log("[AttackButton] Buscando GameObjects en escena:");
+            
+            foreach (var obj in FindObjectsOfType<GameObject>())
+            {
+                if (obj.activeInHierarchy && obj.GetComponent<PlayerAttack>() != null)
+                {
+                    Debug.Log($"[AttackButton] Encontrado PlayerAttack en: {obj.name}");
+                    playerAttack = obj.GetComponent<PlayerAttack>();
+                }
+            }
         }
     }
-
-    /// <summary>
-    /// Método público que se llama desde el evento OnClick del botón UI
-    /// </summary>
+    
     public void OnFireButtonPressed()
     {
+        OnAttackClicked();
+    }
+    
+    void OnAttackClicked()
+    {
+        Debug.Log("[AttackButton] Botón presionado");
+        
+        if (playerAttack == null)
+        {
+            Debug.LogError("[AttackButton] playerAttack es NULL! Reintentando búsqueda...");
+            FindPlayerAttack();
+        }
+        
         if (playerAttack != null)
         {
-            Debug.Log("[AttackButton] Botón de disparo presionado!");
             playerAttack.Atacar();
+            Debug.Log("[AttackButton] Atacar() ejecutado");
         }
         else
         {
-            Debug.LogError("[AttackButton] PlayerAttack es null, no se puede atacar!");
+            Debug.LogError("[AttackButton] Todavía no se puede atacar - PlayerAttack no encontrado");
+        }
+    }
+    
+    void OnDestroy()
+    {
+        if (button != null)
+        {
+            button.onClick.RemoveListener(OnAttackClicked);
         }
     }
 }

@@ -40,7 +40,6 @@ public class MazeGenerator : MonoBehaviour
         maze = new int[width, height];
         InitializeMaze();
 
-        // 1. CALCULAR INICIO
         int startX = 0;
         int startY = 0;
         if (startTarget != null)
@@ -52,7 +51,6 @@ public class MazeGenerator : MonoBehaviour
             startY = Mathf.Clamp(startY, 0, height - 1);
         }
 
-        // 2. CALCULAR SALIDA
         int targetX = -1;
         int targetY = -1;
         if (doorTarget != null)
@@ -64,45 +62,35 @@ public class MazeGenerator : MonoBehaviour
             targetY = Mathf.Clamp(targetY, 0, height - 1);
         }
 
-        // 3. GENERAR
         GenerateMaze(startX, startY);
 
-        // --- LIMPIEZA MANUAL (LO QUE PIDES) ---
-        // 1. Borramos el muro donde está la puerta
         maze[startX, startY] = 0;
 
-        // 2. Borramos los dos vecinos (Izquierda/Derecha o Arriba/Abajo)
-        if (startY == 0 || startY == height - 1) // Si la puerta está Arriba o Abajo
+
+        if (startY == 0 || startY == height - 1)
         {
-            // Borramos Izquierda y Derecha
             if (startX > 0) maze[startX - 1, startY] = 0;
             if (startX < width - 1) maze[startX + 1, startY] = 0;
 
-            // Opcional: Si quieres borrar también uno más hacia adentro para que no choque de cara
             int dirY = (startY == 0) ? 1 : -1;
             maze[startX, startY + dirY] = 0;
         }
-        else // Si la puerta está a los lados (Izq o Der)
+        else
         {
-            // Borramos Arriba y Abajo
             if (startY > 0) maze[startX, startY - 1] = 0;
             if (startY < height - 1) maze[startX, startY + 1] = 0;
 
-            // Opcional: Uno hacia adentro
             int dirX = (startX == 0) ? 1 : -1;
             maze[startX + dirX, startY] = 0;
         }
         // --------------------------------------
 
-        // Abrir salida
         if (targetX != -1) maze[targetX, targetY] = 0;
 
         SpawnBossDoor();
 
-        // El muro exterior respetará el ancho que pongas en el Inspector
         BuildPerimeter(startX, startY, targetX, targetY);
 
-        // Poner la puerta visual de entrada
         SpawnEntranceDoor(startX, startY);
 
         BuildDungeon();
@@ -176,7 +164,6 @@ public class MazeGenerator : MonoBehaviour
                 }
                 else
                 {
-                    // Guardamos posición para enemigos
                     Vector3 pos = new Vector3(startX + (x * cellSize), 0, startZ + (y * cellSize)) + offset;
                     Vector3 worldPos = transform.position + pos;
                     emptyCells.Add(worldPos);
@@ -196,6 +183,8 @@ public class MazeGenerator : MonoBehaviour
             if (Random.Range(0, 100) < enemyPercentage)
             {
                 Instantiate(enemyPrefab, emptyCells[i], Quaternion.identity);
+                GameObject enemy = Instantiate(enemyPrefab, emptyCells[i], Quaternion.identity);
+                enemy.SetActive(true); // Asegurar que el enemigo esté activo
             }
         }
     }
@@ -204,44 +193,33 @@ public class MazeGenerator : MonoBehaviour
     {
         if (entranceDoorPrefab == null) return;
 
-        // 1. Calcular el centro de la celda (como antes)
         float startMapX = -(width * cellSize) / 2f;
         float startMapZ = -(height * cellSize) / 2f;
         Vector3 offsetCentro = new Vector3(cellSize / 2f, 0, cellSize / 2f);
 
         Vector3 finalPos = new Vector3(startMapX + (x * cellSize), 0, startMapZ + (y * cellSize)) + offsetCentro;
 
-        // 2. Calcular Rotación y EMPUJAR hacia la pared (Offset)
         Quaternion rotation = Quaternion.Euler(0, rotacionExtraEntrada, 0);
         Vector3 empuje = Vector3.zero;
 
-        // Pared ABAJO (y=0) -> Empujamos hacia atrás (Z negativo)
         if (y == 0)
         {
             empuje = new Vector3(0, 0, -offsetMuroEntrada);
         }
-        // Pared ARRIBA -> Empujamos hacia adelante (Z positivo)
         else if (y == height - 1)
         {
             empuje = new Vector3(0, 0, offsetMuroEntrada);
         }
-        // Pared IZQUIERDA -> Empujamos hacia izquierda (X negativo)
         else if (x == 0)
         {
             empuje = new Vector3(-offsetMuroEntrada, 0, 0);
         }
-        // Pared DERECHA -> Empujamos hacia derecha (X positivo)
         else
         {
             empuje = new Vector3(offsetMuroEntrada, 0, 0);
         }
 
-        // 3. Crear la puerta sumando el empuje
-        // Nota: Mantenemos el ajuste de altura global si lo usas
         Vector3 posDefinitiva = transform.position + finalPos + empuje;
-
-        // (Opcional) Si necesitas subir esta puerta específica, suma a la Y aquí:
-        // posDefinitiva.y += 0.5f; 
 
         Instantiate(entranceDoorPrefab, posDefinitiva, rotation, transform);
     }
@@ -281,14 +259,10 @@ public class MazeGenerator : MonoBehaviour
         float startMapZ = -(height * cellSize) / 2f;
         Vector3 offset = new Vector3(cellSize / 2f, 0, cellSize / 2f);
 
-        // --- PAREDES LATERALES (Izquierda y Derecha) ---
         for (int y = 0; y < height; y++)
         {
-            // Calculamos si la fila 'y' está dentro del ancho que queremos abrir
-            // Si anchoEntrada es 3, abrirá: el centro, uno arriba y uno abajo.
             bool esRangoEntrada = (Mathf.Abs(startY - y) <= anchoEntrada / 2);
 
-            // IZQUIERDA (x = -1)
             bool huecoEntradaIzq = (startX == 0 && esRangoEntrada);
             bool huecoSalidaIzq = (doorX == 0 && doorY == y);
 
@@ -298,7 +272,6 @@ public class MazeGenerator : MonoBehaviour
                 Instantiate(wallPrefab, transform.position + pos, Quaternion.identity, transform);
             }
 
-            // DERECHA (x = width)
             bool huecoEntradaDer = (startX == width - 1 && esRangoEntrada);
             bool huecoSalidaDer = (doorX == width - 1 && doorY == y);
 
@@ -309,13 +282,10 @@ public class MazeGenerator : MonoBehaviour
             }
         }
 
-        // --- PAREDES SUPERIOR E INFERIOR (Arriba y Abajo) ---
         for (int x = 0; x < width; x++)
         {
-            // Calculamos si la columna 'x' está dentro del ancho
             bool esRangoEntrada = (Mathf.Abs(startX - x) <= anchoEntrada / 2);
 
-            // ABAJO (y = -1)
             bool huecoEntradaAbajo = (startY == 0 && esRangoEntrada);
             bool huecoSalidaAbajo = (doorY == 0 && doorX == x);
 
@@ -325,7 +295,6 @@ public class MazeGenerator : MonoBehaviour
                 Instantiate(wallPrefab, transform.position + pos, Quaternion.Euler(0, 90, 0), transform);
             }
 
-            // ARRIBA (y = height)
             bool huecoEntradaArriba = (startY == height - 1 && esRangoEntrada);
             bool huecoSalidaArriba = (doorY == height - 1 && doorX == x);
 
@@ -350,17 +319,13 @@ public class MazeGenerator : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // 1. DIBUJAR CAJA AMARILLA (Límites del mapa)
         Gizmos.color = Color.yellow;
         Vector3 size = new Vector3(width * cellSize, 1, height * cellSize);
         Gizmos.DrawWireCube(transform.position, size);
-
-        // 2. DIBUJAR CAJA ROJA (Salida / Boss)
         if (doorTarget != null)
         {
             Gizmos.color = Color.red;
 
-            // Calculamos posición
             Vector3 localPos = doorTarget.position - transform.position;
             int tx = Mathf.FloorToInt((localPos.x + (width * cellSize / 2f)) / cellSize);
             int ty = Mathf.FloorToInt((localPos.z + (height * cellSize / 2f)) / cellSize);
@@ -377,12 +342,10 @@ public class MazeGenerator : MonoBehaviour
             Gizmos.DrawLine(doorTarget.position, dPos);
         }
 
-        // 3. DIBUJAR CAJA VERDE (Entrada) - ¡CORREGIDO!
         if (startTarget != null)
         {
             Gizmos.color = Color.green;
 
-            // Calculamos posición
             Vector3 localPos = startTarget.position - transform.position;
             int sx = Mathf.FloorToInt((localPos.x + (width * cellSize / 2f)) / cellSize);
             int sy = Mathf.FloorToInt((localPos.z + (height * cellSize / 2f)) / cellSize);
@@ -395,7 +358,6 @@ public class MazeGenerator : MonoBehaviour
 
             Vector3 entPos = transform.position + new Vector3(mapStartX + (sx * cellSize), 0, mapStartZ + (sy * cellSize)) + offset;
 
-            // AHORA DIBUJA SOLO EL ANCHO DE LA ENTRADA (Sin usar variables borradas)
             Gizmos.DrawWireCube(entPos, new Vector3(cellSize * anchoEntrada, 2, cellSize));
             Gizmos.DrawLine(startTarget.position, entPos);
         }

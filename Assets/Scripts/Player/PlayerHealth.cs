@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
-    [Header("Configuración de Vida")]
+    [Header("Vida")]
     private float health;
     private float lerpTimer;
     public float maxHealth = 100f;
@@ -14,23 +14,19 @@ public class PlayerHealth : MonoBehaviour
     public Image backHealthBar;
 
     [Header("Sistema de Respawn")]
-    private Vector3 spawnPosition; // Para recordar dónde naciste
+    private Vector3 spawnPosition;
     private Quaternion spawnRotation;
-    private CharacterController charController; // Por si usas CharacterController
+    private CharacterController charController;
 
     void Start()
     {
-        // 1. Inicializar vida
         health = maxHealth;
 
-        // 2. Guardar posición de nacimiento (Spawn)
         spawnPosition = transform.position;
         spawnRotation = transform.rotation;
 
-        // 3. Detectar si usamos CharacterController (necesario para el TP)
         charController = GetComponent<CharacterController>();
 
-        // 4. Inicializar Barras
         if (frontHealthBar != null) frontHealthBar.fillAmount = 1f;
         if (backHealthBar != null) backHealthBar.fillAmount = 1f;
     }
@@ -43,14 +39,12 @@ public class PlayerHealth : MonoBehaviour
 
     public void UpdateHealthUI()
     {
-        // Protección: Si no has asignado las imágenes en el Inspector, no hacemos nada para evitar errores
         if (frontHealthBar == null || backHealthBar == null) return;
 
         float fillF = frontHealthBar.fillAmount;
         float fillB = backHealthBar.fillAmount;
         float hFraction = health / maxHealth;
 
-        // Lógica de animación de la barra (Tu código original)
         if (fillB > hFraction)
         {
             frontHealthBar.fillAmount = hFraction;
@@ -76,8 +70,6 @@ public class PlayerHealth : MonoBehaviour
         health -= damage;
         lerpTimer = 0f;
 
-        // --- AQUÍ ESTÁ EL CAMBIO ---
-        // Si la vida llega a 0, ejecutamos el Respawn
         if (health <= 0)
         {
             Respawn();
@@ -92,19 +84,13 @@ public class PlayerHealth : MonoBehaviour
 
     void Respawn()
     {
-        Debug.Log("¡JUGADOR MUERTO! Volviendo al inicio...");
-
-        // 1. Truco para mover CharacterController (si existe)
         if (charController != null) charController.enabled = false;
 
-        // 2. Teletransportar al punto guardado en Start
         transform.position = spawnPosition;
         transform.rotation = spawnRotation;
 
-        // 3. Reactivar CharacterController
         if (charController != null) charController.enabled = true;
 
-        // 4. Resetear Vida y Barras visuales AL INSTANTE
         health = maxHealth;
         lerpTimer = 0f;
 

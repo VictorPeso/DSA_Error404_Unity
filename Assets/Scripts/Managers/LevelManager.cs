@@ -1,38 +1,24 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Gestor del nivel actual
-/// - Teleporta jugador a SpawnRoom al inicio
-/// - Detecta muerte del boss
-/// - Actualiza progreso cuando boss muere
-/// - Muestra panel de victoria
-/// 
-/// CONFIGURACIÓN EN INSPECTOR:
-/// - Asignar levelNumber (1-5)
-/// - Asignar levelName (ej: "Sector C:/")
-/// - Arrastrar GameObject con tag "Respawn" a spawnRoom
-/// - Arrastrar GameObject del boss (con Enemy.cs)
-/// - Arrastrar victoryPanel (Canvas con VictoryPanel.cs)
-/// </summary>
 public class LevelManager : MonoBehaviour
 {
     [Header("Configuración del Nivel")]
-    [Tooltip("Número del nivel actual (1-5)")]
+    [Tooltip("Número del nivel actual")]
     public int levelNumber = 1;
 
     [Tooltip("Nombre descriptivo del nivel")]
-    public string levelName = "Sector C:/";
+    public string levelName = "Sector 1";
 
     [Header("Referencias de Salas")]
-    [Tooltip("GameObject con tag 'Respawn' - Punto de spawn del jugador")]
+    [Tooltip("Punto de spawn del jugador")]
     public GameObject spawnRoom;
 
-    [Tooltip("GameObject del Boss (debe tener Enemy.cs)")]
+    [Tooltip("GameObject del Boss")]
     public GameObject boss;
 
     [Header("UI")]
-    [Tooltip("Panel de victoria (GameObject con VictoryPanel.cs) - DEBE estar oculto al inicio")]
+    [Tooltip("Panel de victoria")]
     public GameObject victoryPanel;
 
     [Header("Sistema de Puntuación")]
@@ -49,64 +35,60 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
-        Debug.Log($"[LevelManager] Iniciando Nivel {levelNumber} - {levelName}");
-
-        // 1. Buscar referencias si no están asignadas
         FindReferencesIfNeeded();
 
-        // 2. Resetear score de partida
         if (ProgressManager.Instance != null)
         {
             ProgressManager.Instance.ResetCurrentScore();
         }
 
-        // 3. Teleportar jugador a spawn
-        TeleportPlayerToSpawn();
+        if (EquipmentManager.Instance != null)
+        {
+            EquipmentManager.Instance.ResetPotionsUsedCounter();
+        }
 
-        // 4. Suscribir evento de muerte del boss
+        TeleportPlayerToSpawn();
         SubscribeToBossDeathEvent();
     }
 
-    /// <summary>
-    /// Busca referencias automáticamente si no están asignadas en el Inspector
-    /// </summary>
     void FindReferencesIfNeeded()
     {
-        // Buscar SpawnRoom por tag
         if (spawnRoom == null)
         {
             spawnRoom = GameObject.FindWithTag("Respawn");
-            if (spawnRoom != null)
+            if (spawnRoom == null)
             {
-                Debug.Log($"[LevelManager] SpawnRoom encontrado: {spawnRoom.name}");
-            }
-            else
-            {
-                Debug.LogWarning("[LevelManager] ⚠️ No se encontró GameObject con tag 'Respawn'");
-                Debug.LogWarning("[LevelManager] El jugador no será teleportado al inicio");
+                Debug.LogWarning("[LevelManager] No se encontró GameObject con tag 'Respawn'");
             }
         }
 
-        // Buscar Boss por tag
         if (boss == null)
         {
             boss = GameObject.FindWithTag("Boss");
-            if (boss != null)
+            if (boss == null)
             {
-                Debug.Log($"[LevelManager] Boss encontrado: {boss.name}");
+                Debug.LogWarning("[LevelManager] No se encontró GameObject con tag 'Boss'");
+            }
+        }
+
+        if (victoryPanel == null)
+        {
+            Debug.Log("[LevelManager] VictoryPanel no asignado, buscando en la escena...");
+
+            VictoryPanel panelScript = FindObjectOfType<VictoryPanel>();
+            if (panelScript != null)
+            {
+                victoryPanel = panelScript.gameObject;
+                Debug.Log($"[LevelManager] ✅ VictoryPanel encontrado automáticamente: {victoryPanel.name}");
             }
             else
             {
-                Debug.LogWarning("[LevelManager] ⚠️ No se encontró GameObject con tag 'Boss'");
-                Debug.LogWarning("[LevelManager] El sistema de victoria no funcionará");
+                Debug.LogError("[LevelManager] ❌ No se encontró ningún GameObject con componente VictoryPanel en la escena!");
+                Debug.LogError("[LevelManager] SOLUCIÓN: Asegúrate de que hay un panel UI con el script VictoryPanel.cs en la escena");
             }
         }
     }
 
-    /// <summary>
-    /// Teleporta al jugador al punto de spawn
-    /// También actualiza el spawn point de PlayerHealth para respawn
-    /// </summary>
     void TeleportPlayerToSpawn()
     {
         if (spawnRoom == null)
@@ -118,55 +100,49 @@ public class LevelManager : MonoBehaviour
         GameObject player = GameObject.FindWithTag("Player");
         if (player == null)
         {
-            Debug.LogError("[LevelManager] ❌ No se encontró GameObject con tag 'Player'");
+            Debug.LogError("[LevelManager] No se encontró GameObject con tag 'Player'");
             return;
         }
 
-        // Desactivar CharacterController temporalmente para permitir teleport
         CharacterController cc = player.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
 
-        // Teleportar
-        player.transform.position = spawnRoom.transform.position;
+        player.transform.position = spawnRoom.transform.position + Vector3.up * 1f;
         player.transform.rotation = spawnRoom.transform.rotation;
 
-        // Reactivar CharacterController
         if (cc != null) cc.enabled = true;
-
-        Debug.Log($"[LevelManager] Jugador teleportado a SpawnRoom: {spawnRoom.transform.position}");
-
-        // PlayerHealth.Start() ya guarda el spawn point automáticamente
-        // Como acabamos de mover al jugador, PlayerHealth usará esta nueva posición
     }
 
-    /// <summary>
-    /// Suscribe al evento de muerte del boss
-    /// </summary>
     void SubscribeToBossDeathEvent()
     {
+        Debug.Log("[LevelManager] Intentando suscribirse al evento de muerte del boss...");
+
         if (boss == null)
         {
-            Debug.LogWarning("[LevelManager] No se puede suscribir: boss es null");
+            Debug.LogWarning("[LevelManager] ❌ Boss es NULL, no se puede suscribir");
+            Debug.LogWarning("[LevelManager] SOLUCIÓN: Arrastra el GameObject del boss al campo 'Boss' en Inspector");
             return;
         }
+
+        Debug.Log($"[LevelManager] Boss encontrado: {boss.name}");
 
         Enemy bossEnemy = boss.GetComponent<Enemy>();
         if (bossEnemy == null)
         {
-            Debug.LogError($"[LevelManager] ❌ Boss '{boss.name}' no tiene componente Enemy.cs");
+            Debug.LogError($"[LevelManager] ❌ Boss '{boss.name}' NO tiene componente Enemy.cs");
+            Debug.LogError("[LevelManager] SOLUCIÓN: Añade el script Enemy.cs al GameObject del boss");
             return;
         }
 
-        // Suscribir al evento OnDeath
+        Debug.Log("[LevelManager] Componente Enemy encontrado, añadiendo listener...");
         bossEnemy.OnDeath.AddListener(OnBossDefeated);
-        Debug.Log("[LevelManager] Suscrito al evento OnDeath del boss");
+        Debug.Log("[LevelManager] ✅ Suscripción exitosa al evento OnDeath del boss");
     }
 
-    /// <summary>
-    /// Llamado cuando el boss muere
-    /// </summary>
     void OnBossDefeated()
     {
+        Debug.Log("========== [LevelManager] BOSS DERROTADO ==========");
+
         if (bossDefeated)
         {
             Debug.LogWarning("[LevelManager] OnBossDefeated ya fue llamado, ignorando...");
@@ -174,108 +150,96 @@ public class LevelManager : MonoBehaviour
         }
 
         bossDefeated = true;
-        Debug.Log($"[LevelManager] 🎉 ¡BOSS DERROTADO! Nivel {levelNumber} completado");
 
-        // 1. Añadir puntos por boss + bonus de nivel
+        if (boss != null)
+        {
+            Enemy bossEnemy = boss.GetComponent<Enemy>();
+            if (bossEnemy != null)
+            {
+                bossEnemy.OnDeath.RemoveListener(OnBossDefeated);
+                Debug.Log("[LevelManager] Desuscrito del evento OnDeath del boss");
+            }
+        }
+
+        Debug.Log($"[LevelManager] Añadiendo puntos: {pointsPerBoss + levelCompletionBonus}");
+
         if (ProgressManager.Instance != null)
         {
             ProgressManager.Instance.AddScore(pointsPerBoss + levelCompletionBonus);
         }
 
-        // 2. Actualizar progreso si es nuevo récord
         UpdateProgress();
-
-        // 3. Mostrar panel de victoria
+        Debug.Log("[LevelManager] Mostrando panel de victoria...");
         ShowVictoryPanel();
     }
 
-    /// <summary>
-    /// Actualiza el progreso en ProgressManager y sincroniza con backend
-    /// </summary>
     void UpdateProgress()
     {
         if (ProgressManager.Instance == null)
         {
-            Debug.LogError("[LevelManager] ❌ ProgressManager no encontrado");
+            Debug.LogError("[LevelManager] ProgressManager no encontrado");
             return;
         }
 
         int currentScore = ProgressManager.Instance.currentScore;
-
-        // ProgressManager.UpdateProgress() verifica internamente si es nuevo récord
         ProgressManager.Instance.UpdateProgress(levelNumber, currentScore);
     }
 
-    /// <summary>
-    /// Mostrar panel de victoria
-    /// </summary>
     void ShowVictoryPanel()
     {
+        Debug.Log("[LevelManager] ========== ShowVictoryPanel() llamado ==========");
+
         if (victoryPanel == null)
         {
-            Debug.LogWarning("[LevelManager] ⚠️ VictoryPanel no asignado en Inspector");
-            Debug.LogWarning("[LevelManager] Cargando selector de niveles automáticamente...");
-            Invoke("ReturnToMenu", 2f); // Volver al menú después de 2 segundos
+            Debug.LogError("[LevelManager] ❌ VictoryPanel NO está asignado en Inspector!");
+            Debug.LogError("[LevelManager] SOLUCIÓN: Arrastra el GameObject del panel al campo 'Victory Panel'");
+            Invoke("ReturnToMenu", 2f);
             return;
         }
+
+        Debug.Log($"[LevelManager] VictoryPanel encontrado: {victoryPanel.name}");
+        Debug.Log($"[LevelManager] VictoryPanel activo antes: {victoryPanel.activeSelf}");
+        Debug.Log($"[LevelManager] VictoryPanel transform parent: {(victoryPanel.transform.parent != null ? victoryPanel.transform.parent.name : "null")}");
 
         VictoryPanel panel = victoryPanel.GetComponent<VictoryPanel>();
         if (panel != null)
         {
-            // Mostrar victoria con recompensas
-            // TODO: Obtener coins e item del EnemyDropSystem
-            int coinsEarned = 100; // Placeholder
-            string itemName = ""; // Placeholder
-            int nextLevel = levelNumber + 1;
+            int puntosReales = 0;
+            if (ProgressManager.Instance != null)
+            {
+                puntosReales = ProgressManager.Instance.currentScore;
+            }
 
-            panel.ShowVictory(coinsEarned, itemName, nextLevel);
+            panel.ShowVictory(puntosReales, "", levelNumber + 1);
+
+            Debug.Log($"[LevelManager]  Bytes Reales: {puntosReales}");
+        }
+    }
+
+    public void LoadNextLevel()
+    {
+        int nextLevel = levelNumber + 1;
+
+        if (nextLevel <= 5)
+        {
+            SceneManager.LoadScene($"Level_{nextLevel}");
         }
         else
         {
-            Debug.LogError("[LevelManager] ❌ VictoryPanel no tiene componente VictoryPanel.cs");
-            victoryPanel.SetActive(true); // Al menos mostrarlo
+            ReturnToMenu();
         }
     }
 
-    /// <summary>
-    /// Cargar siguiente nivel
-    /// Llamado por VictoryPanel cuando se clickea "Siguiente Nivel"
-    /// </summary>
-    public void LoadNextLevel()
-{
-    int nextLevel = levelNumber + 1;
-
-    if (nextLevel <= 5)
+    public void ReturnToMenu()
     {
-        Debug.Log($"[LevelManager] Cargando Nivel {nextLevel}...");
-        SceneManager.LoadScene($"Level_{nextLevel}");
+        SceneManager.LoadScene("LevelSelector");
     }
-    else
-    {
-        Debug.Log("[LevelManager] 🎊 ¡JUEGO COMPLETADO! Todos los niveles superados");
-        ReturnToMenu();
-    }
-}
 
-/// <summary>
-/// Volver al selector de niveles
-/// Llamado por VictoryPanel cuando se clickea "Menú"
-/// </summary>
-public void ReturnToMenu()
-{
-    Debug.Log("[LevelManager] Volviendo al selector de niveles...");
-    SceneManager.LoadScene("LevelSelector");
-}
-
-/// <summary>
-/// Llamado cuando el jugador mata un enemigo normal (no boss)
-/// Puedes llamar esto desde el script de enemigos normales si quieres
-/// </summary>
-public void OnEnemyKilled()
-{
-    if (ProgressManager.Instance != null)
+    public void OnEnemyKilled()
     {
-        ProgressManager.Instance.AddScore(pointsPerEnemy);
+        if (ProgressManager.Instance != null)
+        {
+            ProgressManager.Instance.AddScore(pointsPerEnemy);
+        }
     }
-}
 }
